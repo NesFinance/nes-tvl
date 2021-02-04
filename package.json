@@ -24,6 +24,7 @@
     "@ethersproject/providers": "^5.0.21",
     "@ethersproject/solidity": "^5.0.9",
     "@pancakeswap-libs/sdk": "^1.0.1",
+    "@truffle/hdwallet-provider": "^1.2.1",
     "axios": "^0.21.1",
     "bignumber.js": "^9.0.1",
     "firebase": "^8.2.5",

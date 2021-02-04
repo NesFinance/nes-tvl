@@ -18,8 +18,16 @@ export const initFirebase = async() => {
     return firebase.firestore()
 }
 
+export const getRCP = async() => {
+    try {
+        const d = await axios.get(configs)
+        return d.data.rcp
+    } catch (error) {
+        return null
+    }    
+}
+
 export const initRCP = async() => {
-    console.log(configs)
     try {
         const d = await axios.get(configs)
         const w = new Web3(d.data.rcp)
