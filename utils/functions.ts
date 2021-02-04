@@ -9,7 +9,7 @@ import abiMasterChef from '../abi/MasterChef'
 import abiCakeLP from '../abi/CakeLP'
 import abiChefCake from '../abi/ChefCake'
 import abiPair from '../abi/Pair'
-import {configs, farms, wbnb, router, factory, cake_pool, jetfuel_pool, masterChef, usdt} from './configs'
+import {configs, farms, wbnb, router, factory, cake_pool, jetfuel_pool, masterChef, usdt, token} from './configs'
 import { ChainId, Token, Route, Pair, TokenAmount } from '@pancakeswap-libs/sdk'
 import firebase from "../firebase";
 import "firebase/firestore";
@@ -61,6 +61,49 @@ export const insertTVL = async(db:any, amount:any) => {
         }
     }).catch(() => { })      
 }
+
+export const insertPrice = async(db:any, amount:any) => {
+    await db.collection("price").doc("price").get().then(async (snapshot:any) => {
+        if (snapshot.exists === true) {
+            let docRef = db.collection("price").doc("price")
+            await docRef.update({ price: parseFloat(amount) })
+        } else {
+            let docRef = db.collection("price").doc("price")
+            await docRef.set({ price: parseFloat(amount) })
+        }
+    }).catch(() => { })      
+}
+
+export const getPriceToken = async(w:any) => {
+    let priceGlobal = 0
+    const TOKEN = new Token(ChainId.MAINNET, token, 18)
+    const WBNB = new Token(ChainId.MAINNET, wbnb, 18)
+    const address = Pair.getAddress(TOKEN, WBNB)
+    const farmPrice = new w.eth.Contract(abiPair, address)
+    await farmPrice.methods.getReserves().call().then(async(r:any) => {
+        let reserves0 = r._reserve0
+        let reserves1 = r._reserve1
+        const balances = TOKEN.sortsBefore(WBNB) ? [reserves0, reserves1] : [reserves1, reserves0]
+        const prices = new Pair(new TokenAmount(TOKEN, balances[0]), new TokenAmount(WBNB, balances[1]))
+        const route = new Route([prices], WBNB)
+        let price:any = route.midPrice.invert().toSignificant(8)
+        const USDT = new Token(ChainId.MAINNET, usdt, 18)
+        const addressUSDT = Pair.getAddress(WBNB, USDT)
+        const farmPriceUSDT = new w.eth.Contract(abiPair, addressUSDT)
+        await farmPriceUSDT.methods.getReserves().call().then(async(r:any) => {
+            let reserves0_USDT = r._reserve0
+            let reserves1_USDT = r._reserve1
+            const balances_USDT = USDT.sortsBefore(WBNB) ? [reserves0_USDT, reserves1_USDT] : [reserves1_USDT, reserves0_USDT]
+            const prices_USDT = new Pair(new TokenAmount(USDT, balances_USDT[0]), new TokenAmount(WBNB, balances_USDT[1]))
+            const route_USDT:any = new Route([prices_USDT], WBNB)
+            let price_USDT = 1 / route_USDT.midPrice.invert().toSignificant(8)
+            let priceToken = price_USDT * price
+            priceGlobal = priceToken
+        })
+    })
+    return priceGlobal
+}
+
 
 export const getTVLUSDT = async(w:any, lp:any, tokenA:any, tokenB:any, tokenLP:any, type:any, from:any) => {
     const _tokenB = new w.eth.Contract(abiToken, tokenB)
@@ -282,3 +325,5 @@ export const getStakingTVL = async(w:any, lp:any, tokenA:any, tokenB:any, tokenL
     tvl = (totalTokensChef * priceA)
     return tvl
 }
+
+
