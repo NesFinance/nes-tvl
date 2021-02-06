@@ -67,6 +67,8 @@ const serve = async() => {
 
     }
 
+    setTimeout(() => { serve() }, 35000)
+
 }
 
 serve()

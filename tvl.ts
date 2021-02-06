@@ -84,7 +84,7 @@ const serve = async() => {
 
         }
     }
-    setTimeout(() => { serve() }, 15000)
+    setTimeout(() => { serve() }, 25000)
 }
 
 serve()
