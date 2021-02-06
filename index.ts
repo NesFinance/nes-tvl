@@ -5,6 +5,16 @@ import { buildSchema } from 'graphql'
 import express from 'express'
 const app = express()
 
+app.use(function(req, res, next) {
+  res.setHeader('Content-Type', 'application/json');
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Headers', 'Authorization, X-API-KEY, Origin , X-Requested-With , Content-Type , Accept , Access-Control-Allow-Request-Method');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT , DELETE');
+  res.setHeader('Allow', 'GET, POST, OPTIONS, PUT , DELETE');
+  res.setHeader('Lomeli', 'GET, POST, OPTIONS, PUT , DELETE');
+  next();
+});
+
 let _farms: any = []
 
 const serve = async () => {
