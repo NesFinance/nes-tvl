@@ -8,6 +8,8 @@
     "start:index": "ts-node index.ts",
     "start:price": "ts-node price.ts",
     "start:mining": "ts-node mining.ts",
+    "start:tvl": "ts-node tvl.ts",
+    "start:apy": "ts-node apy.ts",    
     "build": "tsc --project ./",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
