@@ -17,7 +17,7 @@ const serve = async() => {
         if( isNaN(parseFloat(multiplier.toString())) ){
             multiplier = new BigNumber(0)
         }
-        if (d.from === "staking" && d.type === "own___") {
+        if (d.from === "staking" && d.type === "own") {
             const farm = _farms.filter((farm: any) => { return farm.pid == 1 })[0]
             priceToken = priceBNB_USD.times((await priceGeneral_BNB(_web3, farm.lp, farm.tokenA, farm.pid, masterChef, farm.tokenLP)).tokenPriceVsQuote)
             if( isNaN(parseFloat(priceToken.toString())) ){
@@ -29,7 +29,7 @@ const serve = async() => {
             }
             tvl = priceToken.times(tokenBalanceLP)
         }
-        if (d.from === "staking" && d.type === "other___") {
+        if (d.from === "staking" && d.type === "other") {
             const farm = _farms.filter((farm: any) => { return farm.token == 'CAKE-BNB LP' })[0]
             priceToken = priceBNB_USD.times((await priceGeneral_BNB(_web3, farm.lp, farm.tokenA, farm.pid, masterChef, farm.tokenLP)).tokenPriceVsQuote)
             if( isNaN(parseFloat(priceToken.toString())) ){
@@ -56,7 +56,7 @@ const serve = async() => {
             tvl = tokenBalanceLP.times(lpXusd)
             console.log(tvl.toString())
         }
-        if (d.from !== "staking" && d.type === "other____" && d.tokenB.toLowerCase() === wbnb.toLowerCase() && d.pid !== 4000) {
+        if (d.from !== "staking" && d.type === "other" && d.tokenB.toLowerCase() === wbnb.toLowerCase() && d.pid !== 4000) {
             const dataPrice = await priceTokenForBNB(_web3, d.tokenA)
             priceToken = priceBNB_USD.times(dataPrice)
             if( isNaN(parseFloat(priceToken.toString())) ){
@@ -71,7 +71,7 @@ const serve = async() => {
             const lpXusd = tvlGlobal.div(totalSupply)
             tvl = tokenBalanceLP.times(lpXusd)
         }
-        if (d.from !== "staking" && d.type === "other___" && d.tokenB.toLowerCase() === busd.toLowerCase() && d.pid !== 1700) {
+        if (d.from !== "staking" && d.type === "other" && d.tokenB.toLowerCase() === busd.toLowerCase() && d.pid !== 1700) {
             const dataPrice = await priceTokenForBNB(_web3, d.tokenA)
             priceToken = priceBNB_USD.times(dataPrice)
             if( isNaN(parseFloat(priceToken.toString())) ){
