@@ -54,7 +54,7 @@ const serve = async() => {
             const tvlGlobal = priceTokenA.plus(priceTokenB)
             const lpXusd = tvlGlobal.div(totalSupply)
             tvl = tokenBalanceLP.times(lpXusd)
-            console.log(tvl.toJSON())
+            console.log(tvl.toString())
         }
         if (d.from !== "staking" && d.type === "other____" && d.tokenB.toLowerCase() === wbnb.toLowerCase() && d.pid !== 4000) {
             const dataPrice = await priceTokenForBNB(_web3, d.tokenA)
@@ -91,7 +91,7 @@ const serve = async() => {
         }
         await setGraphQL(`
             mutation {
-                updateTVL( pid:`+d.pid+`, tvl:`+tvl.toJSON()+`, tokenBalanceLP: "`+tokenBalanceLP+`", quoteTokenBlanceLP: "`+0+`", multiplier: "`+parseFloat(multiplier.toJSON())+`") {
+                updateTVL( pid:`+d.pid+`, tvl:`+tvl.toString()+`, tokenBalanceLP: "`+tokenBalanceLP+`", quoteTokenBlanceLP: "`+0+`", multiplier: "`+parseFloat(multiplier.toString())+`") {
                     pid
                 }
                 updatePrice( pid:`+d.pid+`, price:`+priceToken.toJSON()+`) {
