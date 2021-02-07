@@ -3,6 +3,23 @@ import {initRCP, farmList, setGraphQL} from './utils/functions'
 import BigNumber from 'bignumber.js'
 import { BNBtoBUSD, priceGeneral_BNB , balanceTokenInChef, getMultiplier, balanceTokenLP, priceTokenForBNB} from './utils/prices'
 
+const insert = async(pid:any, tvl:any, tokenBalanceLP:any, multiplier:any, priceToken:any) => {
+    await setGraphQL(`
+        mutation {
+            updateTVL( pid:`+pid+`, tvl:`+tvl+`, tokenBalanceLP: "`+tokenBalanceLP+`", quoteTokenBlanceLP: "`+0+`", multiplier: "`+parseFloat(multiplier)+`") {
+                pid
+            }
+            updatePrice( pid:`+pid+`, price:`+priceToken+`) {
+                pid
+                price
+            }                    
+        }
+    `)
+}
+
+
+
+
 const serve = async() => {
     const _web3 = await initRCP()
     const _farms = await farmList()
@@ -28,6 +45,7 @@ const serve = async() => {
                 tokenBalanceLP = new BigNumber(0)
             }
             tvl = priceToken.times(tokenBalanceLP)
+            await insert(d.pid, tvl.toString(), tokenBalanceLP, multiplier.toString(), priceToken.toString())
         }
         if (d.from === "staking" && d.type === "other") {
             const farm = _farms.filter((farm: any) => { return farm.token == 'CAKE-BNB LP' })[0]
@@ -40,6 +58,7 @@ const serve = async() => {
                 tokenBalanceLP = new BigNumber(0)
             }
             tvl = priceToken.times(tokenBalanceLP)
+            await insert(d.pid, tvl.toString(), tokenBalanceLP, multiplier.toString(), priceToken.toString())
         }
         if (d.from === "own" && d.type === "own") {
             priceToken = priceBNB_USD.times((await priceGeneral_BNB(_web3, d.lp, d.tokenA, d.pid, masterChef, d.tokenLP)).tokenPriceVsQuote)
@@ -54,7 +73,9 @@ const serve = async() => {
             const tvlGlobal = priceTokenA.plus(priceTokenB)
             const lpXusd = tvlGlobal.div(totalSupply)
             tvl = tokenBalanceLP.times(lpXusd)
+            console.log(tokenBalanceLP.toString())
             console.log(tvl.toString())
+            await insert(d.pid, tvl.toString(), tokenBalanceLP, multiplier.toString(), priceToken.toString())
         }
         if (d.from !== "staking" && d.type === "other" && d.tokenB.toLowerCase() === wbnb.toLowerCase() && d.pid !== 4000) {
             const dataPrice = await priceTokenForBNB(_web3, d.tokenA)
@@ -70,6 +91,7 @@ const serve = async() => {
             const tvlGlobal = priceTokenA.plus(priceTokenB)
             const lpXusd = tvlGlobal.div(totalSupply)
             tvl = tokenBalanceLP.times(lpXusd)
+            await insert(d.pid, tvl.toString(), tokenBalanceLP, multiplier.toString(), priceToken.toString())
         }
         if (d.from !== "staking" && d.type === "other" && d.tokenB.toLowerCase() === busd.toLowerCase() && d.pid !== 1700) {
             const dataPrice = await priceTokenForBNB(_web3, d.tokenA)
@@ -85,11 +107,14 @@ const serve = async() => {
             const tvlGlobal = priceTokenA.plus(priceTokenB)
             const lpXusd = tvlGlobal.div(totalSupply)
             tvl = tokenBalanceLP.times(lpXusd)
+            await insert(d.pid, tvl.toString(), tokenBalanceLP, multiplier.toString(), priceToken.toString())
         }
         if( isNaN(parseFloat(tvl.toString())) ){
             tvl = new BigNumber(0)
         }
-        await setGraphQL(`
+
+        //console.log(tvl.toString())
+        /*await setGraphQL(`
             mutation {
                 updateTVL( pid:`+d.pid+`, tvl:`+tvl.toString()+`, tokenBalanceLP: "`+tokenBalanceLP+`", quoteTokenBlanceLP: "`+0+`", multiplier: "`+parseFloat(multiplier.toString())+`") {
                     pid
@@ -99,9 +124,9 @@ const serve = async() => {
                     price
                 }                    
             }
-        `)
+        `)*/
     }
-    setTimeout(() => { serve() }, 5000)
+    setTimeout(() => { serve() }, 10000)
 }
 
 serve()
