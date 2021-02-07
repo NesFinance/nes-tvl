@@ -23,7 +23,7 @@ import { Interface } from '@ethersproject/abi'
 export const setGraphQL = async(data:any) => {
     try {
         await axios({
-            url: 'http://localhost:80/graphql',
+            url: 'http://localhost:3333/graphql',
             method: 'post',
             data: {query: data}
           })
@@ -35,7 +35,7 @@ export const setGraphQL = async(data:any) => {
 export const getFarmGraphQL = async(id:any) => {
     try {
         let d = await axios({
-            url: 'http://localhost:80/graphql',
+            url: 'http://localhost:3333/graphql',
             method: 'post',
             data: {
                 query: `
@@ -248,6 +248,13 @@ export const calculateCakeEarnedPerThousandDollars = ( numberOfDays:any, farmApy
         tokenDecimals,
         quoteTokenDecimals,
       ] = await multicall(web3, erc20, calls)
+
+      console.log("tokenBalanceLP : " + (tokenBalanceLP.toString()))
+      console.log("quoteTokenBlanceLP : " + (quoteTokenBlanceLP.toString()))
+
+      console.log("tokenBalanceLP hex : " + (new BigNumber(tokenBalanceLP.balance._hex).toJSON()))
+      console.log("quoteTokenBlanceLP hex : " + (new BigNumber(quoteTokenBlanceLP.balance._hex).toJSON()))
+      
 
       
       const lpTokenRatio = new BigNumber(lpTokenBalanceMC).div(new BigNumber(lpTotalSupply))

@@ -1,5 +1,4 @@
 import { farmList } from './utils/functions'
-const express_graphql = require('express-graphql');
 import { graphqlHTTP }  from 'express-graphql'
 import { buildSchema } from 'graphql'
 import express from 'express'
@@ -21,7 +20,7 @@ const serve = async () => {
         tvl: 0,
         apy: 0,
         apr: 0,
-        multiplier: '0X',
+        multiplier: 0,
         tokenBalanceLP: 0,
         quoteTokenBlanceLP: 0,
       }
@@ -59,10 +58,6 @@ const serve = async () => {
       cakeEarnedPerThousand365D: String
     }
   `);
-
-
-
-
 
   let getFarm = (args: any) => {
     let pid = args.pid
@@ -133,7 +128,7 @@ const serve = async () => {
     graphiql: true
   }))
 
-  app.listen(80, () => console.log('server on port 80'))
+  app.listen(3333, () => console.log('server on port 3333'))
 
 }
 

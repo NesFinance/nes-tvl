@@ -1,8 +1,42 @@
 import {initRCP, farmList, APY_TOKEN_BNB, getPriceTokenFarm, setGraphQL, farms_Staking, getPriceToken} from './utils/functions'
 import {masterChef } from './utils/configs'
 import BigNumber from 'bignumber.js'
+import { BNBtoBUSD, priceGeneral_BNB , balanceTokenInChef, getMultiplier, balanceTokenLP, priceTokenForBNB} from './utils/prices'
+import {wbnb, busd} from './utils/configs'
+
+import { getApyOtherLP, apyBNBConvert} from './utils/apy'
 
 const serve = async() => {
+    const _web3 = await initRCP()
+    const _farms = await farmList()
+    const priceBNB_USD = await BNBtoBUSD(_web3)
+    for (const k in _farms) {
+        let d = _farms[k]
+        let priceToken = new BigNumber(0)
+
+        if (d.from !== "staking" && d.type === "other" && d.tokenB.toLowerCase() === wbnb.toLowerCase() && d.pid === 4) {
+            const dataPrice = await priceTokenForBNB(_web3, d.tokenA)
+            priceToken = priceBNB_USD.times(dataPrice)
+            if( isNaN(parseFloat(priceToken.toString())) ){
+                priceToken = new BigNumber(0)
+            }
+
+            let dataAPY = await getApyOtherLP(_web3, d.lp, d.tokenA, d.tokenB, d.pid, masterChef, d.tokenLP, priceToken)
+            let getAPY = await apyBNBConvert(dataAPY)
+
+            //console.log("priceToken : " + priceToken.toJSON())
+
+            //console.log(dataAPY)
+            //console.log(getAPY)
+            
+
+        }
+
+    }
+
+}
+
+const _serve = async() => {
     const _web3 = await initRCP()
     const _farms = await farmList()
     const priceBNB_USD = new BigNumber(1).div((await getPriceTokenFarm(_web3, "0x1B96B92314C44b159149f7E0303511fB2Fc4774f", "0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56", 2, "0x73feaa1eE314F8c655E354234017bE2193C9E24E", "0x1B96B92314C44b159149f7E0303511fB2Fc4774f")).tokenPriceVsQuote)
